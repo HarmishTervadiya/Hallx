@@ -6,26 +6,49 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Image,
   Platform,
-  SafeAreaView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { SwatchBook } from "lucide-react-native";
 
 interface Wallet {
   index: number;
   publicKey: string;
   privateKey: string;
-  path: string;
+  coin_index: string;
 }
+
+type Curreny = {
+  name: string;
+  coin_index: number | null;
+  iconUrl: string;
+};
+
+const currencies: Curreny[] = [
+  {
+    name: "Solana",
+    coin_index: 501,
+    iconUrl: "https://cdn.coinranking.com/Sy33Krudb/btc.svg",
+  },
+  {
+    name: "Etherium",
+    coin_index: 60,
+    iconUrl: "https://cdn.coinranking.com/Sy33Krudb/btc.svg",
+  },
+];
 
 export default function WalletGenerator() {
   const [mnemonic, setMnemonic] = useState("");
   const [loading, setLoading] = useState(false);
   const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [selectedCurrency, setSelectedCurrency] = useState<Curreny>(
+    currencies[0],
+  );
 
   // Function to determine the API URL based on the platform
   const getApiUrl = () => {
@@ -33,7 +56,7 @@ export default function WalletGenerator() {
       return "/api/wallet";
     }
     // For mobile, we need the local IP of the dev server
-    if(process.env.EXPO_PUBLIC_APP_URL){
+    if (process.env.EXPO_PUBLIC_APP_URL) {
       return process.env.EXPO_PUBLIC_APP_URL + "/api/wallet";
     }
     const debuggerHost = Constants.expoConfig?.hostUri;
@@ -60,6 +83,7 @@ export default function WalletGenerator() {
         },
         body: JSON.stringify({
           mnemonic: newPhrase,
+          coin_index: selectedCurrency?.coin_index,
           index: nextIndex,
         }),
       });
@@ -81,48 +105,127 @@ export default function WalletGenerator() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.header}>Solana Wallet Generator</Text>
+    <SafeAreaView className="flex-1 p-8 container bg-[#0a0a0a]">
+      <View className="absolute inset-0 pointer-events-none">
+        <svg width="100%" height="100%">
+          <defs>
+            <pattern
+              id="grid"
+              width={40}
+              height={40}
+              patternUnits="userSpaceOnUse"
+            >
+              <line
+                x1="0"
+                y1="0"
+                x2="40"
+                y2="0"
+                stroke="rgba(0,255,148,0.07)"
+                strokeWidth="1"
+              />
+              <line
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="40"
+                stroke="rgba(0,255,148,0.07)"
+                strokeWidth="1"
+              />
+            </pattern>
+          </defs>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Enter mnemonic phrase..."
-          placeholderTextColor="#666"
-          value={mnemonic}
-          onChangeText={setMnemonic}
-          autoCapitalize="none"
-        />
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+      </View>
+      <View>
+        <Text className="flex items-center color-[#00ff94] text-2xl lg:text-4xl m-6 font-semibold">
+          <SwatchBook size={30} /> Hallx
+        </Text>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleGenerateWallet}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Generate Next Wallet</Text>
-          )}
-        </TouchableOpacity>
+        <Text className="color-green-400 font-medium text-lg lg:text-xl px-6">
+          Your all in one wallet store
+        </Text>
+
+        <View className="p-6 gap-4 flex-1 flex-row flex-wrap justify-between items-center">
+          <TextInput
+            className="flex-1 p-4 rounded-lg border border-y-2 bg-gray-900 border-b-green-400 color-white "
+            placeholder="Enter mnemonic phrase..."
+            placeholderTextColor="#666"
+            value={mnemonic}
+            onChangeText={setMnemonic}
+            autoCapitalize="none"
+            underlineColorAndroid={"transparent"}
+            selectionColor="rgba(0,255,148,0.6)"
+          />
+          <TouchableOpacity
+            className="sm:flex-1 justify-center items-center lg:flex-none bg-green-500 py-3.5 px-8 rounded-lg"
+            onPress={handleGenerateWallet}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text className="text-md lg:text-lg font-semibold color-white">
+                Generate
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        <View className="flex-1 flex-wrap px-6 flex-row gap-4">
+          {currencies.map((item) => (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              key={item.coin_index}
+              onPress={() =>
+                selectedCurrency?.coin_index === item.coin_index
+                  ? setSelectedCurrency({
+                      iconUrl: "",
+                      name: "",
+                      coin_index: null,
+                    })
+                  : setSelectedCurrency(item)
+              }
+              style={
+                selectedCurrency?.coin_index === item.coin_index && {
+                  backgroundColor: "#22c55e",
+                }
+              }
+              className="p-4 rounded-lg elevation gap-2 flex-row justify-center items-center border border-gray-700 h-12 cursor-pointer"
+            >
+              <Image
+                source={{ uri: item.iconUrl }}
+                className="h-6 w-6 color-white"
+              />
+              <Text className="color-white">{item.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
         {wallets.length > 0 && (
-          <View style={styles.listContainer}>
-            <Text style={styles.subHeader}>
-              Generated Wallets ({wallets.length})
+          <View className="p-6">
+            <Text className="color-green-400 text-lg lg:text-2xl font-semibold py-2">
+              Your Wallets ({wallets.length})
             </Text>
+
             <FlatList
               data={wallets}
               keyExtractor={(item) => item.publicKey}
               renderItem={({ item }) => (
-                <View style={styles.walletCard}>
-                  <Text style={styles.label}>Index: {item.index}</Text>
-                  <Text style={styles.label}>Public Key:</Text>
-                  <Text style={styles.value}>{item.publicKey}</Text>
+                <View className="my-2 bg-gray-900 p-4 rounded-lg gap-2 elevation">
+                  <Text className="color-gray-300 font-bold">
+                    Wallet: {item.index + 1}
+                  </Text>
+                  <Text className="color-gray-100 font-semibold">
+                    Public Key:
+                  </Text>
+                  <Text className="color-gray-200">{item.publicKey}</Text>
 
-                  <Text style={styles.label}>Private Key:</Text>
+                  <Text className="color-gray-100 font-semibold">
+                    Private Key:
+                  </Text>
                   <Text
-                    style={styles.value}
+                    className="color-gray-200"
                     numberOfLines={1}
                     ellipsizeMode="middle"
                   >
@@ -137,73 +240,3 @@ export default function WalletGenerator() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  content: {
-    padding: 20,
-    flex: 1,
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#333",
-    textAlign: "center",
-  },
-  subHeader: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 10,
-    color: "#333",
-  },
-  input: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    marginBottom: 15,
-    color: "#333",
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  listContainer: {
-    flex: 1,
-  },
-  walletCard: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  label: {
-    fontSize: 12,
-    color: "#888",
-    marginTop: 5,
-    fontWeight: "bold",
-  },
-  value: {
-    fontSize: 14,
-    color: "#333",
-    fontFamily: "monospace",
-  },
-});
