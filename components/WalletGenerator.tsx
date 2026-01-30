@@ -1,5 +1,6 @@
 import { generateMnemonic } from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english.js";
+import * as Clipboard from "expo-clipboard";
 import { Copy, Eye, EyeOff, SwatchBook, Trash2 } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import {
@@ -13,10 +14,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import * as Clipboard from "expo-clipboard";
 
-import { SafeAreaView } from "react-native-safe-area-context";
 import { clearData, getData, storeData } from "@/utils/storage";
+import { SafeAreaView } from "react-native-safe-area-context";
+import SolanaLogo from "@/assets/images/solana-logo.png";
+import EthereumLogo from "@/assets/images/ethereum-logo.png";
 
 export interface Wallet {
   index: number;
@@ -27,23 +29,23 @@ export interface Wallet {
 }
 
 type Currency = {
-  name: string;
-  coin_index: number | null;
-  iconUrl: string;
+  name: "Solana" | "Ethereum";
+  coin_index: number;
+  icon: any;
   color: string;
 };
 
-const CURRENCIES: Currency[] = [
+const CURRENCIES:Currency[] = [
   {
     name: "Solana",
     coin_index: 501,
-    iconUrl: "https://cryptologos.cc/logos/solana-sol-logo.png",
+    icon: SolanaLogo,
     color: "#9945FF",
   },
   {
     name: "Ethereum",
     coin_index: 60,
-    iconUrl: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
+    icon: EthereumLogo,
     color: "#627EEA",
   },
 ];
@@ -52,7 +54,7 @@ export default function WalletGenerator() {
   const [mnemonic, setMnemonic] = useState("");
   const [loading, setLoading] = useState(false);
   const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(
+  const [selectedCurrency, setSelectedCurrency] = useState(
     CURRENCIES[0],
   );
 
@@ -249,11 +251,11 @@ export default function WalletGenerator() {
                   activeOpacity={0.7}
                   className={`flex-1 p-3 rounded-xl flex-row items-center justify-center gap-2 border ${
                     isSelected
-                      ? "bg-gray-800 border-[#00ff94]"
-                      : "bg-gray-900 border-gray-800 opacity-60"
-                  }`}
+                    ? "bg-gray-800 border-[#00ff94]"
+                    : "bg-gray-900 border-gray-800 opacity-60"
+                    }`}
                 >
-                  <Image source={{ uri: item.iconUrl }} className="h-6 w-6" />
+                  <Image source={item.icon}  className="h-6 w-6 max-h-6 max-w-6 object-contain" />
                   <Text
                     className={`font-bold ${isSelected ? "text-white" : "text-gray-400"}`}
                   >
@@ -287,8 +289,8 @@ export default function WalletGenerator() {
                   <View className="flex-row justify-between items-center p-4 bg-gray-800/50 border-b border-gray-800">
                     <View className="flex-row items-center gap-2">
                       <Image
-                        source={{ uri: currencyInfo.iconUrl }}
-                        className="w-5 h-5"
+                        source={currencyInfo.icon}
+                        className="w-5 h-5 max-h-5 max-w-5 object-contain"
                       />
                       <Text className="text-white font-bold text-base">
                         {wallet.currency} Wallet {wallet.index + 1}
