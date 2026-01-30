@@ -45,9 +45,9 @@ export async function POST(request: Request) {
     } else if (coin_index === 60) {
       currency = "Ethereum";
       path = `m/44'/60'/0'/0/${walletIndex}`;
-      
-      const hdNode = HDNodeWallet.fromSeed(seed)
-      const derivedWallet=hdNode.derivePath(path)
+
+      const hdNode = HDNodeWallet.fromSeed(seed);
+      const derivedWallet = hdNode.derivePath(path);
 
       privateKey = derivedWallet.privateKey;
       publicKey = derivedWallet.address;

@@ -63,7 +63,8 @@ export default function WalletGenerator() {
 
   const getApiUrl = () => {
     if (Platform.OS === "web") return "/api/wallet";
-    if (process.env.EXPO_PUBLIC_APP_URL) // For add the metro server ip address ex: 192.168.0.0
+    if (process.env.EXPO_PUBLIC_APP_URL)
+      // For add the metro server ip address ex: 192.168.0.0
       return process.env.EXPO_PUBLIC_APP_URL + "/api/wallet";
 
     //For testing
@@ -84,7 +85,7 @@ export default function WalletGenerator() {
   }, []);
 
   const handleGenerateWallet = async () => {
-    let newPhrase = mnemonic;
+    let newPhrase = mnemonic.trim();
     if (!newPhrase.trim()) {
       newPhrase = generateMnemonic(wordlist);
       setMnemonic(newPhrase);
