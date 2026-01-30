@@ -1,6 +1,5 @@
 import { generateMnemonic } from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english.js";
-import Constants from "expo-constants";
 import { Copy, Eye, EyeOff, SwatchBook, Trash2 } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import {
@@ -13,7 +12,6 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  ToastAndroid,
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
 

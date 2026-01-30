@@ -3,7 +3,7 @@ import { wordlist } from "@scure/bip39/wordlists/english.js";
 import { Keypair } from "@solana/web3.js";
 import bs58 from "bs58";
 import { derivePath } from "ed25519-hd-key";
-import { ethers, HDNodeWallet } from "ethers";
+import { HDNodeWallet } from "ethers";
 
 export async function POST(request: Request) {
   try {
